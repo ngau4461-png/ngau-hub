@@ -5,3 +5,5 @@ release/
 .env.local
 .env.*.local
 sp.env.txt
+.idea/
+supabase/.temp/
