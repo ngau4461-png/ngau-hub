@@ -1,0 +1,52 @@
+name: Build Ngau Hub iOS
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-ios:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build web app
+        run: npm run build
+
+      - name: Sync Capacitor iOS
+        run: npx cap sync ios
+
+      - name: Build iOS app
+        working-directory: ios
+        run: |
+          xcodebuild \
+            -workspace App/App.xcworkspace \
+            -scheme App \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -derivedDataPath build
+
+      - name: Package iOS app
+        run: |
+          mkdir -p ipa
+          cd ios/build/Build/Products/Debug-iphonesimulator
+          zip -r ../../../../../ipa/NgauHub-iOS-Simulator.zip App.app
+
+      - name: Upload iOS build
+        uses: actions/upload-artifact@v4
+        with:
+          name: NgauHub-iOS
+          path: ipa/NgauHub-iOS-Simulator.zip
