@@ -33,7 +33,7 @@ jobs:
         working-directory: ios
         run: |
           xcodebuild \
-            -workspace App/App.xcworkspace \
+            -project App/App.xcodeproj \
             -scheme App \
             -configuration Debug \
             -sdk iphonesimulator \
@@ -43,10 +43,11 @@ jobs:
         run: |
           mkdir -p ipa
           cd ios/build/Build/Products/Debug-iphonesimulator
-          zip -r ../../../../../ipa/NgauHub-iOS-Simulator.zip App.app
+          zip -r "$GITHUB_WORKSPACE/ipa/NgauHub-iOS-Simulator.zip" App.app
 
       - name: Upload iOS build
         uses: actions/upload-artifact@v4
         with:
           name: NgauHub-iOS
           path: ipa/NgauHub-iOS-Simulator.zip
+
